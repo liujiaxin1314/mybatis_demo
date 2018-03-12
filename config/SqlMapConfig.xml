@@ -3,6 +3,12 @@
 PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+<!-- 配置pojo别名 -->
+	<typeAliases>
+		<!-- <typeAlias type="com.jxliu.mybatis.po" alias="person"/> -->
+		<!-- 扫描包的形式创建别名，别名就是类名，不区分大小写 -->
+		<package name="com.jxliu.mybatis.po"/>
+	</typeAliases>
 	<!-- 和spring整合后 environments配置将废除-->
 	<environments default="development">
 		<environment id="development">
@@ -21,5 +27,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 		<!-- resource基于classpath查找 -->
 		<mapper resource="sqlmap/user.xml"/>
 		<mapper resource="mapper/UserMapper.xml"/>
+		<mapper class="com.jxliu.mybatis.mapper.PersonMapper" />
 	</mappers>
+	
 </configuration>

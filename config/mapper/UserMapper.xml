@@ -38,4 +38,14 @@ resultType：查询结果的数据类型，如果时候pojo应该给全路径。
 		INSERT into user (username,birthday,sex,address) 
 		values (#{username}, #{birthday}, #{sex}, #{address})
 	</insert>
+	
+	<select id="getUserListByUsername" parameterType="com.jxliu.mybatis.po.QueryVo" resultType="com.jxliu.mybatis.po.User">
+		select * from User where username like '%${user.username}%';
+	</select>
+	
+	<select id="getUserCount" resultType="int">
+		select count(1) from User;
+	</select>
+	
+	
 </mapper>

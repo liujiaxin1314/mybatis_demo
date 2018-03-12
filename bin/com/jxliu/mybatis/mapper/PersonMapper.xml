@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace是命名空间，作用sql语句的隔离，后面还有重要作用 
+#{}作用就是占位符，相当于jdbc的“?”
+parameterType：查询的参数类型
+resultType：查询结果的数据类型，如果时候pojo应该给全路径。
+-->
+<!-- mapper代理的开发规则：
+	1、namespace必须时候接口的全限定名
+	2、Statementid必须和接口的方法名称一致
+	3、接口方法的参数类型要和parameterType要一致
+	4、接口方法的返回值类型要和resultType一致
+ -->
+<mapper namespace="com.jxliu.mybatis.mapper.PersonMapper">
+	<!-- column对应数据库中字段，property对应pojo中po类的属性 -->
+	<!-- type是类的全路径，id是resultMap的名字 -->
+	<resultMap type="com.jxliu.mybatis.po.Person" id="query_Person_List">
+		<id column="personId" property="id"/>
+		<result column="personName" property="name"/>
+		<result column="personAddress" property="address"/>
+		<result column="personBirthday" property="birthday"/>
+	</resultMap>
+	
+	<!-- parameterType有两种写法：如果在SqlMapConfig配置文件中配置了package扫描，可以直接使用类名代替，首字母大小写不区分,如下：personQueryVo -->
+	<!-- parameterType第二种写法写法：如果在SqlMapConfig配置文件中没有配置了package扫描，直接写类的全路径，如注释代码：com.jxliu.mybatis.po.PersonQueryVo-->
+	<!-- <select id="getPersonList" resultMap="query_Person_List" parameterType="com.jxliu.mybatis.po.PersonQueryVo"> -->
+	<select id="getPersonList" resultMap="query_Person_List" parameterType="personQueryVo">
+		<!-- '%${person.name}%'中的person.name一定要注意理解，不能写成personQueryVo.name,否则会报一个there is not getter setter的异常
+		认真看就可以理解这里的含义，以为Person类作为PersonQueryVo的属性存在，mybatis底层进行了封装，通过这种.的形式代替了get，set方法，实际上使用的是
+		PersonQueryVo中Person的name属性 -->
+		select * from person where personName like '%${person.name}%' 
+		<!-- 为了方便起见，test中ids变量，要尽量保持和pojo中的变量名一致，后台设置查询条件封装到PersonQueryVo中时也要保持一致;
+			collection就是集合的变量名
+			open 和 close 是用来拼接查询语句的，仔细看and personId in(x,x)与下面语句的区别，就是前后拆分开
+			item 是起一个名字，与#{起的名字}相对应
+			separator 是用,进行分割
+			注意：and personId in  这里的话，因为我要同时测试resultMap和foreach一起使用，所以数据库里字段特意与po中建立的不对应，注意这里使用的
+			是数据库中的字段，与上面personName同理。
+		 -->
+		<if test="ids!=null and ids.size>0">
+			<foreach collection="ids" open="and personId in (" close=")" item="id" separator=",">
+				#{id}
+			</foreach>
+		</if> 
+	</select>
+	
+	
+</mapper>
